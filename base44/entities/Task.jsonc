@@ -1,0 +1,78 @@
+{
+  "name": "Task",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "project_id": {
+      "type": "string",
+      "title": "Project ID"
+    },
+    "column": {
+      "type": "string",
+      "title": "Column",
+      "enum": [
+        "backlog",
+        "todo",
+        "in_progress",
+        "review",
+        "done"
+      ],
+      "default": "todo"
+    },
+    "priority": {
+      "type": "string",
+      "title": "Priority",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium"
+    },
+    "assignee": {
+      "type": "string",
+      "title": "Assignee Email"
+    },
+    "assignee_name": {
+      "type": "string",
+      "title": "Assignee Name"
+    },
+    "labels": {
+      "type": "array",
+      "title": "Labels",
+      "items": {
+        "type": "string"
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "title": "Attachments",
+      "items": {
+        "type": "string"
+      }
+    },
+    "position": {
+      "type": "number",
+      "title": "Position",
+      "default": 0
+    },
+    "due_date": {
+      "type": "string",
+      "title": "Due Date",
+      "format": "date"
+    }
+  },
+  "required": [
+    "title",
+    "project_id",
+    "column"
+  ]
+}

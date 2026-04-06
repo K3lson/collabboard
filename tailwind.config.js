@@ -2,8 +2,20 @@
 module.exports = {
     darkMode: ["class"],
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+    safelist: [
+      "bg-indigo-500", "bg-emerald-500", "bg-rose-500", "bg-amber-500", "bg-sky-500", "bg-violet-500",
+      "from-indigo-500", "to-indigo-600", "from-emerald-500", "to-emerald-600",
+      "from-rose-500", "to-rose-600", "from-amber-500", "to-amber-600",
+      "from-sky-500", "to-sky-600", "from-violet-500", "to-violet-600",
+      "bg-indigo-100", "text-indigo-700", "bg-emerald-100", "text-emerald-700",
+      "bg-rose-100", "text-rose-700", "bg-amber-100", "text-amber-700",
+      "bg-sky-100", "text-sky-700",
+    ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			inter: ['var(--font-inter)'],
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

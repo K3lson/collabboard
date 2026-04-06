@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Settings, Archive, ArrowLeft, BarChart3, Kanban, Activity, GanttChartSquare, Layers } from "lucide-react";
+import { Settings, Archive, ArrowLeft, BarChart3, Kanban, Activity, GanttChartSquare, Layers, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,6 +16,8 @@ import TaskFilterBar from "../components/TaskFilterBar";
 import ActivityStream from "../components/ActivityStream";
 import GanttView from "../components/GanttView";
 import TemplateDialog from "../components/TemplateDialog";
+import TimeSheetView from "../components/TimeSheetView";
+import CapacityTab from "../components/CapacityTab";
 
 const colorMap = {
   indigo: "from-indigo-500 to-indigo-600",
@@ -130,6 +132,24 @@ export default function ProjectBoard() {
               <GanttChartSquare className="w-3.5 h-3.5 inline-block mr-1" />
               Gantt
             </button>
+            <button
+              onClick={() => setActiveTab("timesheet")}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                activeTab === "timesheet" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5 inline-block mr-1" />
+              Time
+            </button>
+            <button
+              onClick={() => setActiveTab("capacity")}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                activeTab === "capacity" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 inline-block mr-1" />
+              Capacity
+            </button>
           </div>
 
           <Button variant="ghost" size="icon" className="h-8 w-8" title="Activity" onClick={() => setShowActivity(!showActivity)}>
@@ -172,6 +192,16 @@ export default function ProjectBoard() {
       {activeTab === "gantt" && (
         <div className="flex-1 overflow-hidden relative">
           <GanttView projectId={id} tasks={tasks} onTaskUpdated={loadTasks} />
+        </div>
+      )}
+      {activeTab === "timesheet" && (
+        <div className="flex-1 overflow-hidden">
+          <TimeSheetView projectId={id} />
+        </div>
+      )}
+      {activeTab === "capacity" && (
+        <div className="flex-1 overflow-hidden">
+          <CapacityTab tasks={tasks} onTaskUpdated={loadTasks} />
         </div>
       )}
 

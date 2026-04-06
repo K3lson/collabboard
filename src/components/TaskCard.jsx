@@ -1,4 +1,5 @@
 import { Calendar, Paperclip, MessageSquare } from "lucide-react";
+import TaskTimer from "./TaskTimer";
 import { format } from "date-fns";
 
 const priorityConfig = {
@@ -16,7 +17,7 @@ const labelColors = [
   "bg-sky-100 text-sky-700",
 ];
 
-export default function TaskCard({ task, isDragging, onClick }) {
+export default function TaskCard({ task, isDragging, onClick, commentCount = 0 }) {
   const priority = priorityConfig[task.priority] || priorityConfig.medium;
 
   return (
@@ -71,15 +72,23 @@ export default function TaskCard({ task, isDragging, onClick }) {
               <span className="text-[10px]">{task.attachments.length}</span>
             </div>
           )}
-        </div>
-
-        {/* Assignee */}
-        {task.assignee_name && (
-          <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-semibold text-primary">
-            {task.assignee_name.charAt(0).toUpperCase()}
+          {commentCount > 0 && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <MessageSquare className="w-3 h-3" />
+              <span className="text-[10px]">{commentCount}</span>
+            </div>
+          )}
           </div>
-        )}
-      </div>
-    </div>
-  );
-}
+
+          <div className="flex items-center gap-1.5">
+          <TaskTimer task={task} />
+          {task.assignee_name && (
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-semibold text-primary">
+              {task.assignee_name.charAt(0).toUpperCase()}
+            </div>
+          )}
+          </div>
+          </div>
+          </div>
+          );
+          }

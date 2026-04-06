@@ -1,0 +1,46 @@
+{
+  "name": "TimeLog",
+  "type": "object",
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "title": "Task ID"
+    },
+    "task_title": {
+      "type": "string",
+      "title": "Task Title"
+    },
+    "project_id": {
+      "type": "string",
+      "title": "Project ID"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "User Email"
+    },
+    "user_name": {
+      "type": "string",
+      "title": "User Name"
+    },
+    "start_time": {
+      "type": "string",
+      "title": "Start Time",
+      "format": "date-time"
+    },
+    "end_time": {
+      "type": "string",
+      "title": "End Time",
+      "format": "date-time"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "title": "Duration (minutes)"
+    }
+  },
+  "required": [
+    "task_id",
+    "project_id",
+    "user_email",
+    "start_time"
+  ]
+}

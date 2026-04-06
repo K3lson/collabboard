@@ -1,0 +1,39 @@
+{
+  "name": "Comment",
+  "type": "object",
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "title": "Task ID"
+    },
+    "project_id": {
+      "type": "string",
+      "title": "Project ID"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "User Email"
+    },
+    "user_name": {
+      "type": "string",
+      "title": "User Name"
+    },
+    "content": {
+      "type": "string",
+      "title": "Content"
+    },
+    "mentions": {
+      "type": "array",
+      "title": "Mentioned Users",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "task_id",
+    "project_id",
+    "user_email",
+    "content"
+  ]
+}

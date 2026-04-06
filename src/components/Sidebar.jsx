@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { LayoutDashboard, FolderKanban, Plus, Settings, LogOut, ChevronDown } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Plus, LogOut, ChevronDown, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +17,7 @@ export default function Sidebar() {
   const [projects, setProjects] = useState([]);
   const [user, setUser] = useState(null);
   const [showNewProject, setShowNewProject] = useState(false);
+  const [unreadComments, setUnreadComments] = useState(0);
 
   useEffect(() => {
     loadData();
@@ -24,6 +25,17 @@ export default function Sidebar() {
 
   useEffect(() => {
     const unsub = base44.entities.Project.subscribe(() => loadProjects());
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    const loadUnread = async () => {
+      const comments = await base44.entities.Comment.filter({}, "-created_date", 50);
+      const seenTs = parseInt(localStorage.getItem("collab_comments_global_seen") || "0");
+      setUnreadComments(comments.filter(c => new Date(c.created_date).getTime() > seenTs).length);
+    };
+    loadUnread();
+    const unsub = base44.entities.Comment.subscribe(() => loadUnread());
     return unsub;
   }, []);
 
@@ -57,11 +69,21 @@ export default function Sidebar() {
       <aside className="w-64 h-full flex flex-col bg-card border-r border-border shrink-0">
         {/* Logo */}
         <div className="p-5 border-b border-border">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <FolderKanban className="w-4 h-4 text-primary-foreground" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <FolderKanban className="w-4 h-4 text-primary-foreground" />
+              </div>
+              <span className="text-lg font-bold tracking-tight text-foreground">CollabBoard</span>
             </div>
-            <span className="text-lg font-bold tracking-tight text-foreground">CollabBoard</span>
+            {unreadComments > 0 && (
+              <div className="relative cursor-pointer" onClick={() => { localStorage.setItem("collab_comments_global_seen", Date.now().toString()); setUnreadComments(0); }}>
+                <Bell className="w-4 h-4 text-muted-foreground" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {unreadComments > 9 ? "9+" : unreadComments}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 

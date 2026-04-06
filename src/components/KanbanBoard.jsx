@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import KanbanColumn from "./KanbanColumn";
 import TaskModal from "./TaskModal";
+import CommentsPanel, { getUnseenCount, markCommentsSeen } from "./CommentsPanel";
 import { toast } from "sonner";
 
 const COLUMNS = [
@@ -18,13 +19,29 @@ export default function KanbanBoard({ projectId, filteredTasks }) {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [newTaskColumn, setNewTaskColumn] = useState(null);
+  const [commentsTaskId, setCommentsTaskId] = useState(null);
+  const [commentCounts, setCommentCounts] = useState({});
+  const [projectMembers, setProjectMembers] = useState([]);
 
   useEffect(() => {
     if (!projectId) return;
     loadTasks();
-    const unsub = base44.entities.Task.subscribe(() => loadTasks());
-    return unsub;
+    loadCommentCounts();
+    const unsub1 = base44.entities.Task.subscribe(() => loadTasks());
+    const unsub2 = base44.entities.Comment.subscribe(() => loadCommentCounts());
+    return () => { unsub1(); unsub2(); };
   }, [projectId]);
+
+  const loadCommentCounts = async () => {
+    const comments = await base44.entities.Comment.filter({ project_id: projectId });
+    const counts = {};
+    comments.forEach(c => { counts[c.task_id] = (counts[c.task_id] || 0) + 1; });
+    setCommentCounts(counts);
+    // Derive members from comments
+    const memberMap = {};
+    comments.forEach(c => { memberMap[c.user_email] = { email: c.user_email, name: c.user_name }; });
+    setProjectMembers(Object.values(memberMap));
+  };
 
   const loadTasks = async () => {
     const t = await base44.entities.Task.filter({ project_id: projectId }, "position");
@@ -96,6 +113,7 @@ export default function KanbanBoard({ projectId, filteredTasks }) {
                   isDragOver={snapshot.isDraggingOver}
                   onAddTask={() => handleAddTask(col.id)}
                   onEditTask={handleEditTask}
+                  commentCounts={commentCounts}
                 />
               )}
             </Droppable>
@@ -118,6 +136,14 @@ export default function KanbanBoard({ projectId, filteredTasks }) {
           setShowModal(false);
           loadTasks();
         }}
+      />
+
+      <CommentsPanel
+        taskId={commentsTaskId}
+        projectId={projectId}
+        open={!!commentsTaskId}
+        onClose={() => { setCommentsTaskId(null); markCommentsSeen(projectId); }}
+        projectMembers={projectMembers}
       />
     </>
   );

@@ -2,7 +2,7 @@ import { Plus } from "lucide-react";
 import { Draggable } from "@hello-pangea/dnd";
 import TaskCard from "./TaskCard";
 
-export default function KanbanColumn({ column, tasks, provided, isDragOver, onAddTask, onEditTask }) {
+export default function KanbanColumn({ column, tasks, provided, isDragOver, onAddTask, onEditTask, commentCounts = {} }) {
   return (
     <div className="flex flex-col w-72 shrink-0">
       {/* Column Header */}
@@ -38,7 +38,7 @@ export default function KanbanColumn({ column, tasks, provided, isDragOver, onAd
                 {...prov.draggableProps}
                 {...prov.dragHandleProps}
               >
-                <TaskCard task={task} isDragging={snap.isDragging} onClick={() => onEditTask(task)} />
+                <TaskCard task={task} isDragging={snap.isDragging} onClick={() => onEditTask(task)} commentCount={commentCounts[task.id] || 0} />
               </div>
             )}
           </Draggable>

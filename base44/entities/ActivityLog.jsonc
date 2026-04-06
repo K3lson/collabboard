@@ -1,0 +1,41 @@
+{
+  "name": "ActivityLog",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "title": "Project ID"
+    },
+    "action": {
+      "type": "string",
+      "title": "Action",
+      "enum": [
+        "created_task",
+        "updated_task",
+        "deleted_task",
+        "moved_task",
+        "uploaded_file"
+      ]
+    },
+    "task_title": {
+      "type": "string",
+      "title": "Task Title"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "User Email"
+    },
+    "user_name": {
+      "type": "string",
+      "title": "User Name"
+    },
+    "details": {
+      "type": "string",
+      "title": "Details"
+    }
+  },
+  "required": [
+    "project_id",
+    "action"
+  ]
+}

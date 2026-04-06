@@ -12,7 +12,7 @@ const COLUMNS = [
   { id: "done", title: "Done", color: "bg-emerald-500" },
 ];
 
-export default function KanbanBoard({ projectId }) {
+export default function KanbanBoard({ projectId, filteredTasks }) {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -51,8 +51,9 @@ export default function KanbanBoard({ projectId }) {
     });
   };
 
+  const displayTasks = filteredTasks || tasks;
   const getColumnTasks = (columnId) =>
-    tasks.filter((t) => t.column === columnId).sort((a, b) => (a.position || 0) - (b.position || 0));
+    displayTasks.filter((t) => t.column === columnId).sort((a, b) => (a.position || 0) - (b.position || 0));
 
   const handleAddTask = (columnId) => {
     setNewTaskColumn(columnId);

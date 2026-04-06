@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Settings, Archive, ArrowLeft } from "lucide-react";
+import { Settings, Archive, ArrowLeft, BarChart3, Kanban, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,6 +11,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import KanbanBoard from "../components/KanbanBoard";
 import PresenceBar from "../components/PresenceBar";
+import AnalyticsTab from "../components/analytics/AnalyticsTab";
+import TaskFilterBar from "../components/TaskFilterBar";
+import ActivityStream from "../components/ActivityStream";
 
 const colorMap = {
   indigo: "from-indigo-500 to-indigo-600",
@@ -26,12 +29,23 @@ export default function ProjectBoard() {
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("board");
+  const [tasks, setTasks] = useState([]);
+  const [filteredTasks, setFilteredTasks] = useState(null);
+  const [showActivity, setShowActivity] = useState(false);
 
   useEffect(() => {
     loadProject();
-    const unsub = base44.entities.Project.subscribe(() => loadProject());
-    return unsub;
+    loadTasks();
+    const unsub1 = base44.entities.Project.subscribe(() => loadProject());
+    const unsub2 = base44.entities.Task.subscribe(() => loadTasks());
+    return () => { unsub1(); unsub2(); };
   }, [id]);
+
+  const loadTasks = async () => {
+    const t = await base44.entities.Task.filter({ project_id: id }, "position");
+    setTasks(t);
+  };
 
   const loadProject = async () => {
     const projects = await base44.entities.Project.filter({ id });
@@ -81,8 +95,35 @@ export default function ProjectBoard() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <PresenceBar projectId={id} />
+
+          {/* Tab switcher */}
+          <div className="flex items-center bg-muted rounded-lg p-0.5 gap-0.5">
+            <button
+              onClick={() => setActiveTab("board")}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                activeTab === "board" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Kanban className="w-3.5 h-3.5 inline-block mr-1" />
+              Board
+            </button>
+            <button
+              onClick={() => setActiveTab("analytics")}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                activeTab === "analytics" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5 inline-block mr-1" />
+              Analytics
+            </button>
+          </div>
+
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowActivity(!showActivity)}>
+            <Activity className="w-4 h-4" />
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -99,10 +140,23 @@ export default function ProjectBoard() {
         </div>
       </div>
 
-      {/* Kanban Board */}
-      <div className="flex-1 overflow-hidden">
-        <KanbanBoard projectId={id} />
-      </div>
+      {/* Content */}
+      {activeTab === "board" && (
+        <>
+          <TaskFilterBar tasks={tasks} onFiltered={setFilteredTasks} />
+          <div className="flex-1 overflow-hidden">
+            <KanbanBoard projectId={id} filteredTasks={filteredTasks} />
+          </div>
+        </>
+      )}
+      {activeTab === "analytics" && (
+        <div className="flex-1 overflow-hidden">
+          <AnalyticsTab projectId={id} />
+        </div>
+      )}
+
+      {/* Activity Stream */}
+      <ActivityStream projectId={id} open={showActivity} onClose={() => setShowActivity(false)} />
     </div>
   );
 }

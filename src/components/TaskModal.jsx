@@ -18,10 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2 } from "lucide-react";
+import { Trash2, Link2 } from "lucide-react";
 import FileUploader from "./FileUploader";
 
-export default function TaskModal({ open, onOpenChange, task, projectId, defaultColumn, onSaved, onDeleted }) {
+export default function TaskModal({ open, onOpenChange, task, projectId, defaultColumn, onSaved, onDeleted, allTasks = [] }) {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -31,6 +31,8 @@ export default function TaskModal({ open, onOpenChange, task, projectId, default
     assignee_name: "",
     labels: [],
     due_date: "",
+    start_date: "",
+    depends_on: [],
     attachments: [],
   });
   const [loading, setLoading] = useState(false);
@@ -47,6 +49,8 @@ export default function TaskModal({ open, onOpenChange, task, projectId, default
         assignee_name: task.assignee_name || "",
         labels: task.labels || [],
         due_date: task.due_date || "",
+        start_date: task.start_date || "",
+        depends_on: task.depends_on || [],
         attachments: task.attachments || [],
       });
     } else {
@@ -59,6 +63,8 @@ export default function TaskModal({ open, onOpenChange, task, projectId, default
         assignee_name: "",
         labels: [],
         due_date: "",
+        start_date: "",
+        depends_on: [],
         attachments: [],
       });
     }
@@ -153,14 +159,25 @@ export default function TaskModal({ open, onOpenChange, task, projectId, default
             </div>
           </div>
 
-          <div>
-            <Label>Due Date</Label>
-            <Input
-              type="date"
-              value={form.due_date}
-              onChange={(e) => setForm((f) => ({ ...f, due_date: e.target.value }))}
-              className="mt-1.5"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label>Start Date</Label>
+              <Input
+                type="date"
+                value={form.start_date}
+                onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
+                className="mt-1.5"
+              />
+            </div>
+            <div>
+              <Label>Due Date</Label>
+              <Input
+                type="date"
+                value={form.due_date}
+                onChange={(e) => setForm((f) => ({ ...f, due_date: e.target.value }))}
+                className="mt-1.5"
+              />
+            </div>
           </div>
 
           <div>
@@ -201,6 +218,36 @@ export default function TaskModal({ open, onOpenChange, task, projectId, default
               </div>
             )}
           </div>
+
+          {allTasks.filter(t => t.id !== task?.id).length > 0 && (
+            <div>
+              <Label className="flex items-center gap-1.5 mb-1.5">
+                <Link2 className="w-3.5 h-3.5" /> Dependencies
+              </Label>
+              <p className="text-xs text-muted-foreground mb-2">This task cannot move to In Progress until all dependencies are Done.</p>
+              <div className="space-y-1 max-h-32 overflow-y-auto">
+                {allTasks.filter(t => t.id !== task?.id).map(t => (
+                  <label key={t.id} className="flex items-center gap-2 p-1.5 rounded hover:bg-muted/50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.depends_on.includes(t.id)}
+                      onChange={(e) => {
+                        setForm(f => ({
+                          ...f,
+                          depends_on: e.target.checked
+                            ? [...f.depends_on, t.id]
+                            : f.depends_on.filter(id => id !== t.id)
+                        }));
+                      }}
+                      className="rounded"
+                    />
+                    <span className="text-xs truncate">{t.title}</span>
+                    <span className="text-[10px] text-muted-foreground ml-auto shrink-0">{t.column}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <Label>Attachments</Label>

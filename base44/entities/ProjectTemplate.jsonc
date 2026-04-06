@@ -1,0 +1,57 @@
+{
+  "name": "ProjectTemplate",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Template Name"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "color": {
+      "type": "string",
+      "title": "Color",
+      "enum": [
+        "indigo",
+        "emerald",
+        "rose",
+        "amber",
+        "sky",
+        "violet"
+      ],
+      "default": "indigo"
+    },
+    "example_tasks": {
+      "type": "array",
+      "title": "Example Tasks",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "column": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

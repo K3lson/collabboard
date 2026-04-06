@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import KanbanColumn from "./KanbanColumn";
 import TaskModal from "./TaskModal";
+import { toast } from "sonner";
 
 const COLUMNS = [
   { id: "backlog", title: "Backlog", color: "bg-slate-400" },
@@ -37,6 +38,20 @@ export default function KanbanBoard({ projectId, filteredTasks }) {
 
     const taskId = draggableId;
     const newColumn = destination.droppableId;
+    const task = tasks.find(t => t.id === taskId);
+
+    // Dependency check: block moving to in_progress if deps not done
+    if (newColumn === "in_progress" && task?.depends_on?.length) {
+      const unmetDeps = task.depends_on.filter(depId => {
+        const dep = tasks.find(t => t.id === depId);
+        return dep && dep.column !== "done";
+      });
+      if (unmetDeps.length > 0) {
+        const depTitles = unmetDeps.map(depId => tasks.find(t => t.id === depId)?.title || depId).join(", ");
+        toast.error(`Cannot start: unfinished dependencies — ${depTitles}`);
+        return;
+      }
+    }
 
     // Optimistic update
     setTasks((prev) =>
@@ -94,6 +109,7 @@ export default function KanbanBoard({ projectId, filteredTasks }) {
         task={selectedTask}
         projectId={projectId}
         defaultColumn={newTaskColumn}
+        allTasks={tasks}
         onSaved={() => {
           setShowModal(false);
           loadTasks();

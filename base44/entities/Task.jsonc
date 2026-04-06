@@ -68,6 +68,18 @@
       "type": "string",
       "title": "Due Date",
       "format": "date"
+    },
+    "start_date": {
+      "type": "string",
+      "title": "Start Date",
+      "format": "date"
+    },
+    "depends_on": {
+      "type": "array",
+      "title": "Depends On (Task IDs)",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [
